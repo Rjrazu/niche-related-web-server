@@ -26,20 +26,28 @@ async function run() {
         const productsCollection = database.collection('products');
         const selectedCollection = database.collection('selected_products')
         const usersCollection = database.collection('users');
+        const reviewCollection = database.collection("reviews");
 
 
 
-        // add data to cart collection with additional info
+        // add products data to cart collection
         app.post("/products/add", async (req, res) => {
             const products = req.body;
             const result = await productsCollection.insertOne(products);
             res.json(result);
         });
 
-        // add data to cart collection with additional info
+        // add selected data to cart collection
         app.post("/product/add", async (req, res) => {
             const product = req.body;
             const result = await selectedCollection.insertOne(product);
+            res.json(result);
+        });
+
+        // adding review
+        app.post("/review/add", async (req, res) => {
+            const review = req.body;
+            const result = await reviewCollection.insertOne(review);
             res.json(result);
         });
 
@@ -49,6 +57,12 @@ async function run() {
             const cursor = productsCollection.find({});
             const products = await cursor.toArray();
             res.send(products);
+        })
+        //Get Full API for Review
+        app.get('/reviews', async (req, res) => {
+            const cursor = reviewCollection.find({});
+            const review = await cursor.toArray();
+            res.send(review);
         })
 
         //GET selected Full API
@@ -91,6 +105,7 @@ async function run() {
             res.json(result);
         });
 
+        // set Admin 
         app.get('/users/:email', async (req, res) => {
             const email = req.params.email;
             const query = { email: email };
@@ -102,7 +117,7 @@ async function run() {
             res.json({ admin: isAdmin });
         })
 
-
+        // save User
         app.post('/users', async (req, res) => {
             const user = req.body;
             const result = await usersCollection.insertOne(user);
@@ -110,6 +125,7 @@ async function run() {
             res.json(result);
         });
 
+        // update user
         app.put('/users', async (req, res) => {
             const user = req.body;
             const filter = { email: user.email };
@@ -119,6 +135,7 @@ async function run() {
             res.json(result);
         });
 
+        // Add admin role
         app.put('/users/admin', async (req, res) => {
             const user = req.body;
             const filter = { email: user.email }
